@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Nos Cuisiniers{% endblock %}
+
+{% block content %}
+<h1>Liste des Cuisiniers</h1>
+
+<ul>
+    {% for cuisinier in cuisiniers %}
+        <li>
+            <strong>{{ cuisinier.nom }}</strong> – Spécialité : {{ cuisinier.specialite }}
+        </li>
+    {% empty %}
+        <li>Pas encore de cuisiniers enregistrés.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'liste_plats' %}">← Retour aux plats</a>
+{% endblock %}

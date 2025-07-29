@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Accueil - Mon Plat en Ligne{% endblock %}
+
+{% block content %}
+<div class="accueil-container" style="text-align: center; padding: 60px 20px; background: #f7f7f7;">
+    <h1 style="font-size: 48px; color: #333;">Bienvenue sur Mon Plat en Ligne 🍽️</h1>
+    <p style="font-size: 18px; color: #666; max-width: 600px; margin: 20px auto;">
+        Commandez vos plats préférés, vos produits du marché et recevez-les chez vous ! 👨🏾‍🍳👩🏾‍🍳
+    </p>
+
+    <div style="margin-top: 40px;">
+        <a href="{% url 'liste_plats' %}" style="padding: 15px 30px; font-size: 18px; background-color: #ff5e5e; color: white; text-decoration: none; border-radius: 8px; margin: 10px;">Commander un plat</a>
+        <a href="{% url 'liste_produits_marche' %}" style="padding: 15px 30px; font-size: 18px; background-color: #44c767; color: white; text-decoration: none; border-radius: 8px; margin: 10px;">Acheter au marché</a>
+    </div>
+
+    <div style="margin-top: 60px;">
+        <img src="https://cdn.pixabay.com/photo/2016/03/05/19/02/abstract-1238247_960_720.jpg" alt="Cuisine" style="width: 80%; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    </div>
+</div>
+{% endblock %}

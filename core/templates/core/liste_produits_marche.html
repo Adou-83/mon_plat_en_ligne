@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h1>Liste des Produits du Marché</h1>
+
+{% for produit in produits %}
+  <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+    <h3>{{ produit.nom }}</h3>
+    <p>Quantité disponible : {{ produit.quantite }} {{ produit.unite }}</p>
+    <p>Prix : {{ produit.prix }} FCFA</p>
+
+    <form action="{% url 'ajouter_au_panier' 'marche' produit.id %}" method="post">
+      {% csrf_token %}
+      <label for="quantite_{{ produit.id }}">Quantité :</label>
+      <input id="quantite_{{ produit.id }}" type="number" name="quantite" value="1" min="1" style="width:50px;">
+      <button type="submit">Ajouter au panier</button>
+    </form>
+  </div>
+{% empty %}
+  <p>Aucun produit disponible.</p>
+{% endfor %}
+
+<a href="{% url 'voir_panier' %}">Voir mon panier</a>
+{% endblock %}

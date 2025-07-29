@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Passer la commande{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">📦 Finaliser votre commande</h2>
+
+    <form method="post" class="bg-white p-4 rounded shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom complet</label>
+            <input type="text" class="form-control" name="nom" id="nom" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="telephone" class="form-label">Téléphone</label>
+            <input type="text" class="form-control" name="telephone" id="telephone" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="adresse" class="form-label">Adresse de livraison</label>
+            <textarea class="form-control" name="adresse" id="adresse" rows="3" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">✅ Valider la commande</button>
+        <a href="{% url 'voir_panier' %}" class="btn btn-secondary ms-2">⬅️ Retour au panier</a>
+    </form>
+</div>
+{% endblock %}

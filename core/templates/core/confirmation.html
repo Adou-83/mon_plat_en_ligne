@@ -1,0 +1,5 @@
+ <h2>Merci {{ commande.nom_client }} pour votre commande !</h2>
+<p>Numéro de commande : {{ commande.id }}</p>
+<p>Date : {{ commande.date_commande }}</p>
+<p>Total : {{ commande.total }} FCFA</p>
+<a href="{% url 'liste_plats' %}">Retour aux plats</a>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Validation de la commande</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="nom_client">Nom :</label><br />
+    <input type="text" id="nom_client" name="nom_client" required /><br /><br />
+
+    <label for="adresse_livraison">Adresse de livraison :</label><br />
+    <textarea id="adresse_livraison" name="adresse_livraison" rows="4" required></textarea><br /><br />
+
+    <label for="telephone">Téléphone :</label><br />
+    <input type="tel" id="telephone" name="telephone" required /><br /><br />
+
+    <button type="submit">Confirmer la commande</button>
+</form>
+{% endblock %}

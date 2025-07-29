@@ -1,0 +1,9 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Confirmation de commande{% endblock %}
+
+{% block content %}
+    <h1>Merci !</h1>
+    <p>Votre commande a bien été prise en compte.</p>
+    <a href="{% url 'liste_plats' %}">Retour à la liste des plats</a>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% block title %}Liste des Plats{% endblock %}
+
+{% block content %}
+<h1>Liste des Plats</h1>
+
+{% for plat in plats %}
+  <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+    <h3>{{ plat.nom }}</h3>
+    <p>{{ plat.description }}</p>
+    <p>Prix : {{ plat.prix }} FCFA</p>
+
+    <form action="{% url 'ajouter_au_panier' 'plat' plat.id %}" method="post">
+      {% csrf_token %}
+      <label for="quantite_{{ plat.id }}">Quantité :</label>
+      <input id="quantite_{{ plat.id }}" type="number" name="quantite" value="1" min="1" style="width:50px;">
+      <button type="submit">Ajouter au panier</button>
+    </form>
+  </div>
+{% empty %}
+  <p>Aucun plat disponible.</p>
+{% endfor %}
+{% endblock %}
