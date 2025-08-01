@@ -1,17 +1,20 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Plat, ProduitMarche, Commande, CommandeItem
 from django.views.decorators.http import require_POST
-from django.shortcuts import render, redirect
-from .forms import CommandeForm
+from .models import Plat, ProduitMarche
 from django.contrib.auth.decorators import login_required
+from .models import Commande, CommandeItem
 
 def accueil(request):
     return render(request, 'core/accueil.html')
 
 def liste_plats(request):
-    plats = Plat.objects.filter(disponible=True).select_related('categorie')
-    return render(request, 'core/liste_plats.html', {'plats': plats})
+    query = request.GET.get('q', '')
+    if query:
+        plats = Plat.objects.filter(nom__icontains=query, disponible=True)
+    else:
+        plats = Plat.objects.filter(disponible=True)
+    return render(request, 'core/liste_plats.html', {'plats': plats, 'query': query})
 
 def liste_produits_marche(request):
     produits = ProduitMarche.objects.all()
@@ -38,7 +41,7 @@ def ajouter_au_panier(request, type_produit, item_id):
         item = get_object_or_404(ProduitMarche, id=item_id)
     else:
         messages.error(request, "Type de produit inconnu.")
-        return redirect('liste_plats')
+        return redirect('accueil')
 
     messages.success(request, f"{item.nom} ajouté au panier ({panier[type_produit][str(item_id)]} pcs).")
     return redirect('voir_panier')
@@ -58,7 +61,7 @@ def voir_panier(request):
         quantite = panier['plat'].get(str(plat.id), 0)
         total = plat.prix * quantite
         panier_plats.append({
-            'item': plat,
+            'plat': plat,
             'quantite': quantite,
             'total': total,
         })
@@ -70,7 +73,7 @@ def voir_panier(request):
         quantite = panier['marche'].get(str(produit.id), 0)
         total = produit.prix * quantite
         panier_marche.append({
-            'item': produit,
+            'nom': produit.nom,
             'quantite': quantite,
             'total': total,
         })
@@ -86,52 +89,58 @@ def voir_panier(request):
         'total_general': total_general,
     })
 
-@require_POST
-def modifier_quantite_panier(request, type_produit, item_id):
-    quantite = int(request.POST.get('quantite', 1))
-    panier = request.session.get('panier', {})
-
-    if type_produit in panier and str(item_id) in panier[type_produit]:
-        panier[type_produit][str(item_id)] = quantite
-        request.session['panier'] = panier
-        messages.success(request, "Quantité modifiée.")
-    else:
-        messages.error(request, "Article non trouvé dans le panier.")
-    return redirect('voir_panier')
-
-@require_POST
-def supprimer_du_panier(request, type_produit, item_id):
-    panier = request.session.get('panier', {})
-    if type_produit in panier and str(item_id) in panier[type_produit]:
-        del panier[type_produit][str(item_id)]
-        request.session['panier'] = panier
-        messages.success(request, "Article supprimé du panier.")
-    else:
-        messages.error(request, "Article non trouvé dans le panier.")
-    return redirect('voir_panier')
-
-@login_required
+ 
 def passer_commande(request):
     if request.method == 'POST':
-        form = CommandeForm(request.POST)
-        if form.is_valid():
-            commande = form.save(commit=False)
-            commande.utilisateur = request.user
+        nom = request.POST.get('nom')
+        telephone = request.POST.get('telephone')
+        adresse = request.POST.get('adresse')
+
+        if nom and telephone and adresse:
+            panier = request.session.get('panier', {})
+            if not panier:
+                messages.error(request, "Votre panier est vide.")
+                return redirect('voir_panier')
+
+            commande = Commande.objects.create(
+                nom_client=nom,
+                telephone=telephone,
+                adresse_livraison=adresse,
+                total=0,
+                cuisinier=None
+            )
+
+            total_commande = 0
+
+            for plat_id, quantite in panier.get('plat', {}).items():
+                plat = get_object_or_404(Plat, id=plat_id)
+                CommandeItem.objects.create(
+                    commande=commande,
+                    plat=plat,
+                    quantite=quantite
+                )
+                total_commande += plat.prix * quantite
+
+            for produit_id, quantite in panier.get('marche', {}).items():
+                produit = get_object_or_404(ProduitMarche, id=produit_id)
+                CommandeItem.objects.create(
+                    commande=commande,
+                    produit_marche=produit,
+                    quantite=quantite
+                )
+                total_commande += produit.prix * quantite
+
+            commande.total = total_commande
             commande.save()
-            form.save_m2m()  # si nécessaire
-            return redirect('confirmation_commande')  # Redirige vers confirmation
-    else:
-        form = CommandeForm()
 
-    return render(request, 'commande/passer_commande.html', {'form': form})
+            request.session['panier'] = {}
+            messages.success(request, "Commande enregistrée avec succès ✅")
+            return redirect('accueil')
 
+        else:
+            messages.error(request, "Veuillez remplir tous les champs ❌")
+            # Redessine le formulaire rempli, si besoin tu peux aussi renvoyer les données saisies
+            return render(request, "commande/passer_commande.html")
 
-def confirmation_commande(request):
-    return render(request, 'commande/confirmation_commande.html')
-
-
-
-def valider_commande(request):
-    # Logique de validation simple (à améliorer ensuite si tu veux)
-    # Par exemple, tu peux afficher un message ou rediriger vers une page de confirmation
-    return redirect('confirmation_commande')
+    # 👉 Manquait ce return pour les requêtes GET
+    return render(request, "commande/passer_commande.html")

@@ -1,53 +1,78 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
+
+{% load humanize %}
+
+{% block title %}Votre Panier{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center mb-4">🛒 Mon Panier</h2>
+<div class="row">
+  <div class="col-md-6">
 
-  <!-- Plats -->
-  {% if panier.plats %}
-  <div class="card mb-4">
-    <div class="card-header bg-primary text-white">Plats commandés</div>
-    <ul class="list-group list-group-flush">
-      {% for plat in panier.plats %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ plat.nom }} - Quantité: {{ plat.quantite }}
-        <span class="badge bg-success rounded-pill">{{ plat.total }} FCFA</span>
-      </li>
-      {% endfor %}
-    </ul>
-    <div class="card-footer text-end fw-bold">
-      Total Plats : {{ panier.total_plats }} FCFA
-    </div>
+    <h1 class="mb-3">Votre panier</h1>
+
+    <!-- Plats -->
+    {% if panier_plats %}
+    <h3 class="mb-2">Plats</h3>
+    <table class="table table-striped table-sm align-middle">
+      <thead>
+        <tr>
+          <th>Plat</th>
+          <th>Quantité</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in panier_plats %}
+        <tr>
+          <td>{{ item.plat.nom }}</td>
+          <td>{{ item.quantite }}</td>
+          <td>{{ item.total|intcomma }} FCFA</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="fw-bold">Total plats : {{ total_plats|intcomma }} FCFA</p>
+    {% endif %}
+
+    <!-- Produits marché -->
+    {% if panier_marche %}
+    <h3 class="mb-2">Produits du marché</h3>
+    <table class="table table-striped table-sm align-middle">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Quantité</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for produit in panier_marche %}
+        <tr>
+          <td>{{ produit.nom }}</td>
+          <td>{{ produit.quantite }}</td>
+          <td>{{ produit.total|intcomma }} FCFA</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="fw-bold">Total produits du marché : {{ total_marche|intcomma }} FCFA</p>
+    {% endif %}
+
+    <hr>
+    <h4>Total général : {{ total_general|intcomma }} FCFA</h4>
+
+    <a href="{% url 'passer_commande' %}" class="btn btn-primary btn-sm mt-3">Passer la commande</a>
+
   </div>
-  {% endif %}
 
-  <!-- Produits du marché -->
-  {% if panier.produits_marche %}
-  <div class="card mb-4">
-    <div class="card-header bg-warning text-dark">Produits du Marché</div>
-    <ul class="list-group list-group-flush">
-      {% for produit in panier.produits_marche %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ produit.nom }} - Quantité: {{ produit.quantite }}
-        <span class="badge bg-success rounded-pill">{{ produit.total }} FCFA</span>
-      </li>
-      {% endfor %}
-    </ul>
-    <div class="card-footer text-end fw-bold">
-      Total Produits du Marché : {{ panier.total_produits_marche }} FCFA
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- Total général -->
-  <div class="text-end mb-4">
-    <h4 class="fw-bold">💰 Total général : {{ panier.total_general }} FCFA</h4>
-  </div>
-
-  <!-- Bouton valider -->
-  <div class="text-center">
-    <a href="{% url 'passer_commande' %}" class="btn btn-lg btn-success">✅ Passer la commande</a>
+  <div class="col-md-6">
+    <h4>Actions</h4>
+    <a href="{% url 'liste_plats' %}" class="btn btn-outline-secondary mb-2 w-100 btn-sm">Continuer vos achats - Plats</a>
+    <a href="{% url 'liste_produits_marche' %}" class="btn btn-outline-secondary mb-2 w-100 btn-sm">Continuer vos achats - Marché</a>
+    <form method="post" action="{% url 'vider_panier' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger w-100 btn-sm">Vider le panier</button>
+    </form>
   </div>
 </div>
 {% endblock %}

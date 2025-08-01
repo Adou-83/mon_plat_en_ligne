@@ -1,31 +1,39 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
 
-{% block title %}Passer la commande{% endblock %}
+{% block title %}Passer Commande{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">📦 Finaliser votre commande</h2>
+<h1>Passer votre commande</h1>
 
-    <form method="post" class="bg-white p-4 rounded shadow-sm">
-        {% csrf_token %}
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li style="color: {% if message.tags == 'error' %}red{% else %}green{% endif %};">
+                {{ message }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
-        <div class="mb-3">
-            <label for="nom" class="form-label">Nom complet</label>
-            <input type="text" class="form-control" name="nom" id="nom" required>
-        </div>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="nom" class="form-label">Nom complet :</label>
+        <input type="text" id="nom" name="nom" required class="form-control" />
+    </div>
 
-        <div class="mb-3">
-            <label for="telephone" class="form-label">Téléphone</label>
-            <input type="text" class="form-control" name="telephone" id="telephone" required>
-        </div>
+    <div class="mb-3">
+        <label for="telephone" class="form-label">Téléphone :</label>
+        <input type="text" id="telephone" name="telephone" required class="form-control" />
+    </div>
 
-        <div class="mb-3">
-            <label for="adresse" class="form-label">Adresse de livraison</label>
-            <textarea class="form-control" name="adresse" id="adresse" rows="3" required></textarea>
-        </div>
+    <div class="mb-3">
+        <label for="adresse" class="form-label">Adresse de livraison :</label>
+        <textarea id="adresse" name="adresse" rows="3" required class="form-control"></textarea>
+    </div>
 
-        <button type="submit" class="btn btn-primary">✅ Valider la commande</button>
-        <a href="{% url 'voir_panier' %}" class="btn btn-secondary ms-2">⬅️ Retour au panier</a>
-    </form>
-</div>
+    <button type="submit" class="btn btn-success">Valider la commande</button>
+</form>
+
+<a href="{% url 'voir_panier' %}">Retour au panier</a>
 {% endblock %}

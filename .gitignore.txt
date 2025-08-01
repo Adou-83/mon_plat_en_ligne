@@ -1,0 +1,16 @@
+# Ignorer les fichiers Python compilés
+__pycache__/
+*.pyc
+
+# Ignorer la base de données locale
+db.sqlite3
+
+# Fichiers d'environnement
+.env
+
+# Logs et fichiers inutiles
+*.log
+*.sqlite3
+*.egg-info/
+media/
+
